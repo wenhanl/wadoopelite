@@ -1,0 +1,61 @@
+map  TaskId: 0 is running in Node: unix2.andrew.cmu.edu
+map  TaskId: 1 is running in Node: unix3.andrew.cmu.edu
+map  TaskId: 2 is running in Node: unix6.andrew.cmu.edu
+reduce  TaskId: 3 is not begin in Node: unix2.andrew.cmu.edu
+reduce  TaskId: 4 is not begin in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is not begin in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+map  TaskId: 0 is done in Node: unix2.andrew.cmu.edu
+map  TaskId: 1 is running in Node: unix3.andrew.cmu.edu
+map  TaskId: 2 is running in Node: unix6.andrew.cmu.edu
+reduce  TaskId: 3 is not begin in Node: unix2.andrew.cmu.edu
+reduce  TaskId: 4 is not begin in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is not begin in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+map  TaskId: 0 is done in Node: unix2.andrew.cmu.edu
+map  TaskId: 1 is done in Node: unix3.andrew.cmu.edu
+map  TaskId: 2 is running in Node: unix6.andrew.cmu.edu
+reduce  TaskId: 3 is not begin in Node: unix2.andrew.cmu.edu
+reduce  TaskId: 4 is not begin in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is not begin in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+map  TaskId: 0 is done in Node: unix2.andrew.cmu.edu
+map  TaskId: 1 is done in Node: unix3.andrew.cmu.edu
+map  TaskId: 2 is done in Node: unix6.andrew.cmu.edu
+reduce  TaskId: 3 is not begin in Node: unix2.andrew.cmu.edu
+reduce  TaskId: 4 is not begin in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is not begin in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+map  TaskId: 0 is done in Node: unix2.andrew.cmu.edu
+map  TaskId: 1 is done in Node: unix3.andrew.cmu.edu
+map  TaskId: 2 is done in Node: unix6.andrew.cmu.edu
+reduce  TaskId: 3 is running in Node: unix2.andrew.cmu.edu
+reduce  TaskId: 4 is not begin in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is not begin in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+map  TaskId: 0 is done in Node: unix2.andrew.cmu.edu
+map  TaskId: 1 is done in Node: unix3.andrew.cmu.edu
+map  TaskId: 2 is done in Node: unix6.andrew.cmu.edu
+reduce  TaskId: 3 is running in Node: unix2.andrew.cmu.edu
+reduce  TaskId: 4 is running in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is not begin in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+map  TaskId: 0 is done in Node: unix2.andrew.cmu.edu
+map  TaskId: 1 is done in Node: unix3.andrew.cmu.edu
+map  TaskId: 2 is done in Node: unix6.andrew.cmu.edu
+reduce  TaskId: 3 is running in Node: unix2.andrew.cmu.edu
+reduce  TaskId: 4 is running in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is running in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+map  TaskId: 0 is done in Node: unix2.andrew.cmu.edu
+map  TaskId: 1 is done in Node: unix3.andrew.cmu.edu
+map  TaskId: 2 is done in Node: unix6.andrew.cmu.edu
+reduce  TaskId: 3 is done in Node: unix2.andrew.cmu.edu
+reduce  TaskId: 4 is running in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is running in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+reduce  TaskId: 4 is done in Node: unix3.andrew.cmu.edu
+reduce  TaskId: 5 is running in Node: unix6.andrew.cmu.edu
+----------------------------------------------
+reduce  TaskId: 5 is done in Node: unix6.andrew.cmu.edu
+----------------------------------------------
