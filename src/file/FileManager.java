@@ -166,7 +166,7 @@ public class FileManager {
         File tempDir = new File(dirPath);
         if(!tempDir.exists()){
             if (tempDir.mkdir()) {
-                System.out.println("Directory " + tempDir.getAbsolutePath() + "is created!");
+                System.out.println("Directory " + tempDir.getAbsolutePath() + " is created!");
             } else {
                 System.out.println("Failed to create directory!");
             }

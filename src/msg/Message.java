@@ -1,7 +1,5 @@
 package msg;
 
-import lombok.Data;
-
 import java.io.*;
 import java.net.SocketAddress;
 
@@ -14,11 +12,6 @@ public class Message implements Serializable{
 
     private Type type;
     private SocketAddress addr;
-
-
-
-
-
 
     public static byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();

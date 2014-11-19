@@ -351,7 +351,6 @@ public class NameNode extends Thread {
         }
     }
 
-    //<<<<<<< HEAD
     public static HashMap<String, ArrayList<Integer>> getfileNodes(){
         return fileNodes;
     }
@@ -359,7 +358,7 @@ public class NameNode extends Thread {
     public static List<String> getdataNodeList() {
         return dataNodeList;
     }
-    //=======
+
     private synchronized void heartBeatTimeoutAction(String addr) {
         // Remove from node list and heartbeat list
 //        System.out.println(addr + "timetime");

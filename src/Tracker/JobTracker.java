@@ -1,6 +1,7 @@
 package Tracker;
 
 import config.Config;
+import file.FileManager;
 import mapr.*;
 import msg.MPMessage;
 import msg.MPMessageManager;
@@ -14,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static file.FileManager.createDir;
 import static msg.MPMessage.MessageType.UPDATE;
 
 /**
@@ -37,9 +36,12 @@ public class JobTracker extends Thread {
         masterServer = new ServerSocket(Config.DATA_PORT);
         coordinator = new MPCoordinator();
         jobDump = new ArrayList<MapReduceJob>();
-        createDir("/tmp/mapreduce");
+        FileManager.createDir(Config.MAP_RESULTS_FOLDER);
     }
 
+    /**
+     * Receive user command
+     */
     private void userActionDaemon() {
         new Thread(new Runnable() {
             @Override
@@ -55,6 +57,10 @@ public class JobTracker extends Thread {
         }).start();
     }
 
+    /**
+     * Take action on user command
+     * @param input
+     */
     private void userCommandHandler(String input) {
         if (input.isEmpty())
             return;
@@ -78,9 +84,6 @@ public class JobTracker extends Thread {
         }
 
     }
-
-
-
 
     public static void rerunMap(List<String> brokenNode) {
         while(true){

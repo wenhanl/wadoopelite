@@ -126,8 +126,6 @@ public class DataNode extends Thread{
                             FileManager.mv(temp, blockFile);
                             temp.delete();
 
-
-
                             System.out.println(blockName + " transfer successfully.");
 
                             // Close socket every time file received

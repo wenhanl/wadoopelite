@@ -1,6 +1,7 @@
 package Tracker;
 
 import config.Config;
+import file.FileManager;
 import mapr.*;
 import msg.MPMessage;
 import msg.MPMessageManager;
@@ -15,12 +16,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import static file.FileManager.createDir;
 
 import static msg.MPMessage.MessageType.PARTITION;
 import static msg.MPMessage.MessageType.TASK;
 
 /**
+ * Task tracker in slave node, in response to scheduling from JobTracker
  * Created by CGJ on 14-11-12.
  */
 public class TaskTracker extends Thread{
@@ -29,9 +30,14 @@ public class TaskTracker extends Thread{
 
     public TaskTracker(int port) throws IOException {
         slaveServer = new ServerSocket(port);
-	createDir("/tmp/mapreduce");
+	    FileManager.createDir(Config.MAP_RESULTS_FOLDER);
     }
 
+    /**
+     * Handle message from JT and other TT
+     * @param MsgManager
+     * @throws IOException
+     */
     private void handleConnection(MPMessageManager MsgManager) throws IOException {
         MPMessage msgIn = MsgManager.receiveMessage();
         if (msgIn.getType() == TASK) {
@@ -44,6 +50,12 @@ public class TaskTracker extends Thread{
         }
     }
 
+
+    /**
+     * Run mapreduce task
+     * @param taskMsg
+     * @param comm
+     */
     private void runMapReduceTask(MPTaskMessage taskMsg, MPMessageManager comm) {
         Task task = taskMsg.getTask();
         if (task instanceof MapperTask) {
@@ -56,6 +68,14 @@ public class TaskTracker extends Thread{
         }
     }
 
+
+    /**
+     *
+     * @param partitionNum
+     * @param task
+     * @return
+     * @throws IOException
+     */
     public List<Record<String, String>> getPartitionedRecords(int partitionNum, ReducerTask task) throws IOException{
         List<Record<String, String>> partitionedRecords = new ArrayList<Record<String, String>>();
         String resultFileName = Config.MAP_RESULTS_FOLDER + "MapTempFile_" + task.getInput();

@@ -31,6 +31,10 @@ public class MPCoordinator {
 
     }
 
+    /**
+     * Schedule mapper tasks
+     * @param tasks
+     */
     public void scheduleMapperTasks(List<Task> tasks) {
         for (Task task : tasks) {
             System.out.println("Task received for scheduling:\n  " + task);
@@ -48,11 +52,14 @@ public class MPCoordinator {
         printLogInfo();
     }
 
+
+    /**
+     * Schedule reducer tasks
+     * @param reducerTask
+     * @param brokenNodes
+     */
     public void scheduleReducerTasks(ReducerTask reducerTask, List<String> brokenNodes) {
         int partitionNum = reducerCounter % (Config.NUM_REDUCERS - brokenNodes.size());
-
-//        while(NameNode.getBrokenNode().contains(Config.SLAVE_NODES[partitionNum]))
-//            partitionNum = (partitionNum+1)%Config.NUM_REDUCERS;
 
         reducerCounter++;
         reducerTask.setPartitionNum(partitionNum);
