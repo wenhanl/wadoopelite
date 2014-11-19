@@ -77,7 +77,7 @@ public class TaskTracker extends Thread{
      * @throws IOException
      */
     public List<Record<String, String>> getPartitionedRecords(int partitionNum, ReducerTask task) throws IOException{
-        List<Record<String, String>> partitionedRecords = new ArrayList<Record<String, String>>();
+        List<Record<String, String>> partitionedRecords = new ArrayList<>();
         String resultFileName = Config.MAP_RESULTS_FOLDER + "MapTempFile_" + task.getInput();
         BufferedReader br = null;
         try {
@@ -87,10 +87,12 @@ public class TaskTracker extends Thread{
         }
         String line;
         while ((line = br.readLine()) != null) {
-            String[] key_value = line.split("\t");
-            int partition = Math.abs(key_value[0].hashCode() % Config.NUM_REDUCERS);
+            int lastTab = line.lastIndexOf("\t");
+            String key = line.substring(0, lastTab);
+            String value = line.substring(lastTab + 1);
+            int partition = Math.abs(key.hashCode() % Config.NUM_REDUCERS);
             if (partition == partitionNum) {
-                partitionedRecords.add(new Record<String, String>(key_value[0], key_value[1]));
+                partitionedRecords.add(new Record<>(key, value));
             }
         }
         br.close();

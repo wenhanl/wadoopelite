@@ -136,7 +136,7 @@ public class DataNode extends Thread{
                             }
                             break;
                         case CONNECTION:
-                            Debug.print("Connection estanblished");
+                            //Debug.print("Connection estanblished");
                             break;
                         case EXCEPTION:
                             System.out.println("Connection reset");

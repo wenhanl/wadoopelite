@@ -17,10 +17,10 @@ public class WordCount extends MapReduceJob<Integer, String, String, String> {
         return new Mapper<Integer, String, String, String>() {
             //map each key to "1"
             public void map(Integer key, String value) {
-                String[] words = value.replaceAll("[^a-zA-Z ]", "").toLowerCase().split(" ");
+                String[] words = value.split(" ");
                 for (String keyWord : words) {
                     if(keyWord.length()!=0)
-                        output.add(new Record<String, String>(keyWord.trim(), "1"));
+                        output.add(new Record<String, String>(keyWord, "1"));
                 }
             }
         };

@@ -5,6 +5,7 @@ import msg.MPMessageManager;
 import msg.MPPartitionMessage;
 import msg.TaskUpdateMessage;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -32,7 +33,7 @@ public class ReduceTaskProcessor extends Thread{
     public List<Record> runReducer(ReducerTask reduceTask) {
 
         // 1. Partition - Ping each Slave and ask Records that belong to task ID and this partition/slaveNum
-        List<Record<String, String>> partitionedRecords = new ArrayList<Record<String, String>>();
+        List<Record<String, String>> partitionedRecords = new ArrayList<>();
 
         for (int i=0;i<Config.SLAVE_NODES.length;i++) {
             try {
@@ -66,23 +67,25 @@ public class ReduceTaskProcessor extends Thread{
         }
 
         // Merge the sorted records by key
-        List<Record<String, List<String>>> reducerRecords = new ArrayList<Record<String, List<String>>>();
+        List<Record<String, List<String>>> reducerRecords = new ArrayList<>();
 
-        List<String> currentValues = new ArrayList<String>();
+        List<String> currentValues = new ArrayList<>();
         String previousKey = partitionedRecords.get(0).getKey();
         currentValues.add(partitionedRecords.get(0).getValue());
         for (int i = 1; i < partitionedRecords.size(); i++) {
             Record<String, String> currentRecord = partitionedRecords.get(i);
             if (!currentRecord.getKey().equals(previousKey)) {
                 // Moved on to the next key, add previous Records to reducerRecords
-                reducerRecords.add(new Record<String, List<String>>(previousKey, currentValues));
+                reducerRecords.add(new Record<>(previousKey, currentValues));
                 previousKey = currentRecord.getKey();
-                currentValues = new ArrayList<String>();
+                currentValues = new ArrayList<>();
             }
             currentValues.add(partitionedRecords.get(i).getValue());
         }
-        reducerRecords.add(new Record<String, List<String>>(previousKey, currentValues));
+        reducerRecords.add(new Record<>(previousKey, currentValues));
 
+
+        writeRecord(reducerRecords);
         // 3. Reduce - Perform reduce operation on every record (key -> list of all values for that key)
         Reducer reducer = reduceTask.getReducer();
         for (Record<String, List<String>> reducerRecord : reducerRecords) {
@@ -93,10 +96,29 @@ public class ReduceTaskProcessor extends Thread{
         return reducer.getReduceOutput();
     }
 
+    // test only
+    private void writeRecord(List<Record<String, List<String>>> reducerRecords){
+        try {
+            FileWriter fileWriter = new FileWriter("../Log/test", true);
+            Iterator iterator = reducerRecords.iterator();
+            while(iterator.hasNext()){
+                fileWriter.write(record((Record<String, List<String>>) iterator.next()));
+                fileWriter.write("\n");
+            }
+            fileWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private String record(Record<String, List<String>> record){
+        String str = "Key: " + record.getKey() + ": ";
+        Iterator i = record.getValue().iterator();
+        while(i.hasNext()){
+            str += i.next() + ", ";
+        }
+        str += "\n";
+        return str;
 
-
-
-
-
+    }
 }

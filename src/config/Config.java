@@ -4,11 +4,12 @@ package config;
  * Created by CGJ on 14-11-13.
  */
 public class Config {
-    public static final String MASTER_NODE = "unix1.andrew.cmu.edu";
+    public static final String MASTER_NODE = "localhost";
     public static final String[] SLAVE_NODES = {
-           "unix2.andrew.cmu.edu",  //"unix2.andrew.cmu.edu"
-	       "unix3.andrew.cmu.edu",
-	       "unix4.andrew.cmu.edu"
+//           "unix2.andrew.cmu.edu",
+//	       "unix3.andrew.cmu.edu",
+//	       "unix4.andrew.cmu.edu"
+            "localhost"
     };
     // port for transferring data in mapreduce phase
     public static final int DATA_PORT = 19782;
@@ -23,7 +24,7 @@ public class Config {
     public static final int BLOCK_SIZE = 100;
 
     // Number of reducers -- this number should less or equal to the number of DataNodes!
-    public static final int NUM_REDUCERS = 3;
+    public static final int NUM_REDUCERS = 1;
 
     // WHFS namenode port
     public static final int NAMENODE_PORT = 15826;

@@ -124,9 +124,9 @@ public class JobTracker extends Thread {
     }
 
     public void newMPJob(MapReduceJob newJob) {
-        List<Task> allTasks = new ArrayList<Task>();
-        List<Integer> mapperTaskId = new ArrayList<Integer>();
-        List<Integer> reducerTaskId = new ArrayList<Integer>();
+        List<Task> allTasks = new ArrayList<>();
+        List<Integer> mapperTaskId = new ArrayList<>();
+        List<Integer> reducerTaskId = new ArrayList<>();
 
         for (int slaveid=0;slaveid < Config.SLAVE_NODES.length;slaveid++) {
             String hostname = Config.SLAVE_NODES[slaveid];
