@@ -90,7 +90,7 @@ public class TaskTracker extends Thread{
             int lastTab = line.lastIndexOf("\t");
             String key = line.substring(0, lastTab);
             String value = line.substring(lastTab + 1);
-            int partition = Math.abs(key.hashCode() % Config.NUM_REDUCERS);
+            int partition = Math.abs(key.hashCode() % Config.SLAVE_NODES.length);
             if (partition == partitionNum) {
                 partitionedRecords.add(new Record<>(key, value));
             }

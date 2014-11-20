@@ -19,11 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by wenhanl on 14-11-3.
  */
 public class NameNode extends Thread {
-    // Map from fileName to block list
-    private HashMap<String, ArrayList<Integer>> fileBlock = null;
-
-    //file in which nodes --  CGJ
-    private static HashMap<String, ArrayList<Integer>> fileNodes = null;
 
     // Map of registered (alive) data nodes
     private ConcurrentHashMap<String, SocketChannel> dataNodes = null;
@@ -59,7 +54,6 @@ public class NameNode extends Thread {
         nodeLastHeartbeat = new ConcurrentHashMap<>();
         nodeBlocks = new ConcurrentHashMap<>();
         blockToNode = new ConcurrentHashMap<>();
-        fileBlock = new HashMap<>();
         whfsFiles = Collections.synchronizedList(new ArrayList<String>());
         brokenNode = new ArrayList<>();
         IpToHostname = new ConcurrentHashMap<>();
@@ -85,7 +79,7 @@ public class NameNode extends Thread {
                         handleMsg(msg);
                         break;
                     case CONNECTION:
-                        String addr = obj.sock.getRemoteAddress().toString();
+                        String addr = getHostname(obj.sock.getRemoteAddress().toString());
                         System.out.println("Connection estanblished from " + addr);
                         // Register new DataNode
                         IpToHostname.put(addr,Config.SLAVE_NODES[NodeIndex++]);
@@ -195,16 +189,21 @@ public class NameNode extends Thread {
      * @param whfsPath WHFS path to import to
      */
     private void importHandler(String localPath, String whfsPath) {
-        // Register whfs file
-        whfsFiles.add(whfsPath);
-
         // Partition local file into blocks
         String inputPath = Config.LOCAL_BASE_PATH + localPath;
+        File local = new File(inputPath);
+        if(!local.exists()){
+            System.out.println("Local file not exist");
+            return;
+        }
         String outputPath = Config.LOCAL_BASE_PATH + localPath + "-split-";
         ArrayList<File> splitFiles = new ArrayList<>();
 
         // Split file from local path into blocks before transfer to DataNodes
         Util.splitFile(inputPath, outputPath);
+
+        // Register whfs file
+        whfsFiles.add(whfsPath);
 
         String blockName;
         String blockPrefix = whfsPath + "_block_";
@@ -217,6 +216,15 @@ public class NameNode extends Thread {
             if (path.contains(outputPath)) {
                 splitFiles.add(file);
             }
+        }
+
+        // Warm file split has reached maximum split limit (26 * 26 = 676)
+        // So result will be inaccurate
+        if(splitFiles.size() == 676){
+            System.out.println("Warming: Your input file is too large and causing too many splits\n" +
+                    " Please increase BLOCK_SIZE in Config to make sure split amount is less than 676 and import again");
+            Util.clearFiles(splitFiles);
+            return;
         }
 
         Collections.sort(splitFiles, new Comparator<File>() {
@@ -239,87 +247,67 @@ public class NameNode extends Thread {
         int offset = 0;
         int nodeIndex = 0;
         int blockIndex = 0;
-        ArrayList<Integer> fileBlockNode = new ArrayList<>();
-        fileNodes = new HashMap<>();
         ArrayList<String> currBlocks;
         ArrayList<String> currNodes;
 
         int replica = Math.min(Config.NUM_WHFS_REPLICA, numNodes);  // Replica number can't be greater than number of nodes
-        for(int rep = 0; rep < 1; rep++) {
-            offset = 0;
-            nodeIndex = rep;
-            blockIndex = 0;
-            for (File file : splitFiles) {
-                int ni = nodeIndex % numNodes;
-                if(rep == 0)
-                    fileBlockNode.add(nodeIndex);
-                String hostname = Config.SLAVE_NODES[ni];
-                String ipaddr = dataNodeList.get(ni);
-//                System.out.println(ipaddr + "ip");
+
+        for (File file : splitFiles) {
+            String hostname = Config.SLAVE_NODES[nodeIndex];
 
 
-                // Register block to node
-                String indexStr = blockIndex < 10 ? "0" + String.valueOf(blockIndex) : String.valueOf(blockIndex);
-                blockName = blockPrefix + indexStr;
+            // Get block name
+            String indexStr = blockIndex < 10 ? "0" + String.valueOf(blockIndex) : String.valueOf(blockIndex);
+            blockName = blockPrefix + indexStr;
 
-                if (blockToNode.containsKey(blockName)) {
-                    currNodes = blockToNode.get(blockName);
-                } else {
-                    currNodes = new ArrayList<>();
-                }
-                currNodes.add(ipaddr);
-                blockToNode.put(blockName, currNodes);
 
-                // Add header to file (hostname and block name)
-                if (rep == 0) {
-                    String header = hostname + "\t" + blockName + "\n";
-                    FileManager.addHeader(file, header);
-                }
+            // Add header to file (hostname and block name)
+            String header = hostname + "\t" + blockName + "\n";
+            FileManager.addHeader(file, header);
 
-                // Transfer file to remote DataNode
-                FileManager.transferFile(file, hostname, Config.DATANODE_FILE_PORT);
 
-                //replica
-                for(int i=1;i<Config.NUM_WHFS_REPLICA;i++)
-                    FileManager.transferFile(file, addHostname(hostname), Config.DATANODE_FILE_PORT);
+            if (blockToNode.containsKey(blockName)) {
+                currNodes = blockToNode.get(blockName);
+            } else {
+                currNodes = new ArrayList<>();
+            }
+
+            // Transfer replicas to remote hosts
+            for(int i = 0;i < replica; i++) {
+                String replicaHost = dataNodeList.get((nodeIndex + i) % numNodes);
+                FileManager.transferFile(file, replicaHost, Config.DATANODE_FILE_PORT);
 
                 // Register node to block
-                if (!nodeBlocks.containsKey(ipaddr)) {
+                if (!nodeBlocks.containsKey(replicaHost)) {
                     currBlocks = new ArrayList<>();
                 } else {
-                    currBlocks = nodeBlocks.get(ipaddr);
+                    currBlocks = nodeBlocks.get(replicaHost);
                 }
-
                 currBlocks.add(blockName);
-                nodeBlocks.put(ipaddr, currBlocks);
+                nodeBlocks.put(replicaHost, currBlocks);
 
-                offset++;
-                blockIndex++;
-
-                // move to next node
-                if (offset == blockPerNode && blockIndex <= (numNodes - 1) * blockPerNode) {
-                    offset = 0;
-                    nodeIndex++;
-                    if(rep == 0)
-                        fileBlockNode.add(nodeIndex);
-                }
+                // Register block to node map
+                currNodes.add(replicaHost);
+                blockToNode.put(blockName, currNodes);
             }
+
+            offset++;
+            blockIndex++;
+
+            // move to next node
+            if (offset == blockPerNode && blockIndex <= (numNodes - 1) * blockPerNode) {
+                offset = 0;
+                nodeIndex++;
+            }
+
         }
         // Clean up
         Util.clearFiles(splitFiles);
-        fileNodes.put(whfsPath,fileBlockNode);
+
+        // Print finish message
+        System.out.println("Import finished.");
     }
 
-    public String addHostname(String hostname){
-        int res = 0;
-        for(int i = 0;i<Config.SLAVE_NODES.length;i++)
-            if(Config.SLAVE_NODES[i] == hostname)
-                res = i;
-        if(res == Config.SLAVE_NODES.length-1)
-            return Config.SLAVE_NODES[0];
-        else
-            return Config.SLAVE_NODES[res];
-    }
     /**
      * Add dataNode to both maps to keep consistency
      * @param key
@@ -329,7 +317,6 @@ public class NameNode extends Thread {
         dataNodeList.add(key);
         dataNodes.put(key, sock);
         nodeLastHeartbeat.put(key, 0);
-//        System.out.println(dataNodeList.get(0));
     }
 
     /**
@@ -346,52 +333,30 @@ public class NameNode extends Thread {
         switch(msg.getType()){
             case HEARTBEAT:
                 // Reset wait time to zero
-                nodeLastHeartbeat.put(msg.getAddr().toString(), 0);
+                nodeLastHeartbeat.put(getHostname(msg.getAddr().toString()), 0);
                 break;
         }
     }
 
-    public static HashMap<String, ArrayList<Integer>> getfileNodes(){
-        return fileNodes;
-    }
-
-    public static List<String> getdataNodeList() {
-        return dataNodeList;
-    }
-
+    /**
+     * Action taken when heartbeat timeout from a host address
+     * @param addr
+     */
     private synchronized void heartBeatTimeoutAction(String addr) {
         // Remove from node list and heartbeat list
-//        System.out.println(addr + "timetime");
         deleteDataNode(addr);
-        String hostname = addr;
-        ArrayList<String> blockList = nodeBlocks.get(hostname);
+        ArrayList<String> blockList = nodeBlocks.get(addr);
 
         for(String block : blockList){
             ArrayList<String> nodelist = blockToNode.get(block);
 
             // Remove addr from this block's blockToNode map
-            nodelist.remove(hostname);
+            nodelist.remove(addr);
             blockToNode.put(block, nodelist);
-
-            // When there is more than 1 node have this block, move it to node without this block
-            if(nodelist.size() > 0 && dataNodeList.size() > 1) {
-                String from = nodelist.get(0);
-                String to = null;
-                for(String node : dataNodeList){
-                    String host = getHostname(node);
-                    if(!nodelist.contains(host)){
-                        to = host;
-                    }
-                }
-            }
         }
 
         // Remove from node to block list
-        nodeBlocks.remove(hostname);
-    }
-
-    private void blockFromTo(String from, String to){
-
+        nodeBlocks.remove(addr);
     }
 
     public static List<String> getBrokenNode() {
@@ -400,6 +365,5 @@ public class NameNode extends Thread {
 
     private String getHostname(String addr){
         return addr.split("/")[1].split(":")[0];
-//>>>>>>> 812321829daa50393288db0dd84ad75964ba09d6
     }
 }

@@ -92,9 +92,9 @@ public class JobTracker extends Thread {
         }
         curTaskId = 0;
         for(MapReduceJob newJob : jobDump){
-            List<Task> allTasks = new ArrayList<Task>();
-            List<Integer> mapperTaskId = new ArrayList<Integer>();
-            List<Integer> reducerTaskId = new ArrayList<Integer>();
+            List<Task> allTasks = new ArrayList<>();
+            List<Integer> mapperTaskId = new ArrayList<>();
+            List<Integer> reducerTaskId = new ArrayList<>();
 
             for (int slaveid=0;slaveid < Config.SLAVE_NODES.length;slaveid++) {
                 if( brokenNode.contains(Config.SLAVE_NODES[slaveid]))
@@ -104,7 +104,7 @@ public class JobTracker extends Thread {
                 mapperTaskId.add(curTaskId++);
             }
 
-            for (int i = 0; i < Config.NUM_REDUCERS - jobDump.size(); i++) {
+            for (int i = 0; i < Config.SLAVE_NODES.length - jobDump.size(); i++) {
                 ReducerTask reducetask = new ReducerTask(newJob.getReducer(), i, mapperTaskId, curTaskId, newJob.getInputFile());
                 allTasks.add(reducetask);
                 reducerTaskId.add(curTaskId++);
@@ -134,7 +134,7 @@ public class JobTracker extends Thread {
             mapperTaskId.add(curTaskId++);
         }
 
-        for (int i = 0; i < Config.NUM_REDUCERS; i++) {
+        for (int i = 0; i < Config.SLAVE_NODES.length; i++) {
             ReducerTask reducetask = new ReducerTask(newJob.getReducer(), i, mapperTaskId, curTaskId, newJob.getInputFile());
             allTasks.add(reducetask);
             reducerTaskId.add(curTaskId++);

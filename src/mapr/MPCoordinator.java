@@ -59,7 +59,7 @@ public class MPCoordinator {
      * @param brokenNodes
      */
     public void scheduleReducerTasks(ReducerTask reducerTask, List<String> brokenNodes) {
-        int partitionNum = reducerCounter % (Config.NUM_REDUCERS - brokenNodes.size());
+        int partitionNum = reducerCounter % (Config.SLAVE_NODES.length- brokenNodes.size());
 
         reducerCounter++;
         reducerTask.setPartitionNum(partitionNum);
