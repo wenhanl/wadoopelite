@@ -161,6 +161,10 @@ public class JobTracker extends Thread {
         }
     }
 
+    /**
+     * Add a new mapreduce job
+     * @param newJob
+     */
     public void newMPJob(MapReduceJob newJob) {
         List<Task> allTasks = new ArrayList<>();
         List<Integer> mapperTaskId = new ArrayList<>();
