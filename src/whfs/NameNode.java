@@ -27,7 +27,7 @@ public class NameNode extends Thread {
     private static List<String> dataNodeList = null;
 
     //IP to hostname
-    private static ConcurrentHashMap<String,String> IpToHostname;
+    private ConcurrentHashMap<String,String> IpToHostname;
 
     // Map of data node socket to last heartbeat time (milisecond);
     private ConcurrentHashMap<String, Integer> nodeLastHeartbeat = null;

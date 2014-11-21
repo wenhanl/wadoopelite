@@ -13,15 +13,15 @@ public class ReducerTask extends Task {
     private int partitionNum;
     private Reducer reducer;
     //the mapper task which the reducer task is dependent
-    private HashMap<Integer, Boolean> mapperJobsStatus;
+    private HashMap<Integer, Boolean> mapperTaskStatus;
 
-    public ReducerTask(Reducer reducer, int partitionNum, List<Integer> mapperJobIds, int taskid, String input) {
+    public ReducerTask(Reducer reducer, int partitionNum, List<Integer> mapperTaskIds, int taskid, String input) {
         super(taskid, input);
         this.reducer = reducer;
         this.partitionNum = partitionNum;
-        mapperJobsStatus = new HashMap<Integer, Boolean>();
-        for (int mapperJobId : mapperJobIds) {
-            mapperJobsStatus.put(mapperJobId, false);
+        mapperTaskStatus = new HashMap<>();
+        for (int mapperTaskId : mapperTaskIds) {
+            mapperTaskStatus.put(mapperTaskId, false);
         }
     }
 
@@ -30,7 +30,7 @@ public class ReducerTask extends Task {
     }
 
     public Set<Integer> getDependentMapperJobIds() {
-        return mapperJobsStatus.keySet();
+        return mapperTaskStatus.keySet();
     }
     /**
      * when a mapper task complete, this method will update the dependent mapper task of the reducer task
@@ -38,9 +38,9 @@ public class ReducerTask extends Task {
      * @param taskId  Id of the mapper job whose status you wish to change
      * @param isDone current running status of that mapper, true: that mapper done, false: mapper is still running
      */
-    public void setMapperJobStatus(int taskId, boolean isDone) {
-        if (mapperJobsStatus.containsKey(taskId)) {
-            mapperJobsStatus.put(taskId, isDone);
+    public void setMapperTaskStatus(int taskId, boolean isDone) {
+        if (mapperTaskStatus.containsKey(taskId)) {
+            mapperTaskStatus.put(taskId, isDone);
         }
     }
     /**
@@ -51,7 +51,7 @@ public class ReducerTask extends Task {
     public boolean allMappersAreReady() {
         boolean mappersReady = true;
         for (int jobID : getDependentMapperJobIds()) {
-            mappersReady &= mapperJobsStatus.get(jobID);
+            mappersReady &= mapperTaskStatus.get(jobID);
         }
         return mappersReady;
     }

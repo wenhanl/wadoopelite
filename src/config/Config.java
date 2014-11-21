@@ -23,9 +23,6 @@ public class Config {
     // Number of lines per block
     public static final int BLOCK_SIZE = 400;
 
-    // Number of reducers -- this number should less or equal to the number of DataNodes!
-    public static final int NUM_REDUCERS = 1;
-
     // WHFS namenode port
     public static final int NAMENODE_PORT = 15826;
 

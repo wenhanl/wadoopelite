@@ -3,19 +3,16 @@ package mapr;
 /**
  * Created by CGJ on 14-11-12.
  */
+import lombok.Data;
+
 import java.io.Serializable;
 
+@Data
 public abstract class MapReduceJob<Kin, Vin, Kout, Vout> implements Serializable {
 
     private String inputFile;
 
-    public String getInputFile() {
-        return inputFile;
-    }
-
-    public void setInputFile(String inputFile) {
-        this.inputFile = inputFile;
-    }
+    private String id;
 
     abstract public Mapper<Kin, Vin, Kout, Vout> getMapper();
 

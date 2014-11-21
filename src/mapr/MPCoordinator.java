@@ -24,6 +24,8 @@ public class MPCoordinator {
     public MPCoordinator() throws IOException {
         this.taskMap = Collections.synchronizedMap(new HashMap<Integer, Task>());
         reducerCounter = 0;
+
+        // Create a empty log file
         PrintWriter writer = new PrintWriter("../Log/log");
         writer.print("");
         writer.close();
@@ -37,7 +39,7 @@ public class MPCoordinator {
      */
     public void scheduleMapperTasks(List<Task> tasks) {
         for (Task task : tasks) {
-            System.out.println("Task received for scheduling:\n  " + task);
+            //System.out.println("Task received for scheduling:\n  " + task);
             taskMap.put(task.getTaskID(), task);
             if (task instanceof MapperTask) {
                 try {
@@ -49,7 +51,7 @@ public class MPCoordinator {
                 task.running = true;
             }
         }
-        printLogInfo();
+        writeToLog();
     }
 
 
@@ -72,25 +74,32 @@ public class MPCoordinator {
             slaveComm.sendMessage(new MPTaskMessage(reducerTask));
             // set running in each task processed to one
             reducerTask.running = true;
-            System.out.println("Reducer task" + partitionNum + " launch!");
-            printLogInfo();
+            //System.out.println("Reducer task" + partitionNum + " launch!");
+            writeToLog();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Process task update message
+     * @param msg
+     */
     public void processTaskUpdateMessage(TaskUpdateMessage msg) {
         final Task targetTask = taskMap.get(msg.getTaskID());
         targetTask.running = msg.isRunning();
         targetTask.done = msg.isDone();
         taskMap.put(targetTask.getTaskID(),targetTask);
-        printLogInfo();
+
+        // Write to log for monitor
+        writeToLog();
+
         if (targetTask instanceof MapperTask) {
             // changes waiting status of reduce jobs that have the map job as it's dependant
             for (Task task : taskMap.values()) {
                 if (task instanceof ReducerTask) {
                     ReducerTask reducerTask = (ReducerTask) task;
-                    reducerTask.setMapperJobStatus(msg.getTaskID(), msg.isDone());
+                    reducerTask.setMapperTaskStatus(msg.getTaskID(), msg.isDone());
                     if (reducerTask.allMappersAreReady()) {
                         //schedule reducer task on a slave
                         System.out.println("All Mappers detected as ready for reducer task with TaskID " + reducerTask.getTaskID() + ", initiating Reducer");
@@ -109,7 +118,7 @@ public class MPCoordinator {
                 taskMap.remove(msg.getTaskID());
                 // Store results in user-defined output file
                 if (msg.getPayload() instanceof List) {
-                    writeOutputReduceRecords((ReducerTask)targetTask, (List<Record>) msg.getPayload());
+                    writeOutputReduceRecords((ReducerTask) targetTask, (List<Record>) msg.getPayload());
                 }
 
                 JobTracker.verifyAllReducerTaskDone((ReducerTask) targetTask);
@@ -118,6 +127,11 @@ public class MPCoordinator {
     }
 
 
+    /**
+     * Write final result to Master local from all reducers.
+     * @param task
+     * @param finalReducerResults
+     */
     public void writeOutputReduceRecords(ReducerTask task, List<Record> finalReducerResults) {
         // Append to output file
         String MPFinalOutputFile = Config.MAP_RESULTS_FOLDER + "MP_Result_" + task.getInput();
@@ -137,7 +151,7 @@ public class MPCoordinator {
         return taskMap;
     }
 
-    void printLogInfo() {
+    private void writeToLog() {
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter("../Log/log", true);

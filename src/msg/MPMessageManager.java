@@ -25,14 +25,6 @@ public class MPMessageManager implements Serializable {
     }
 
 
-    public MPMessageManager(String hostname, String port) throws IOException {
-        this.hostname = hostname;
-        this.port = Integer.parseInt(port);
-
-        sock = new Socket(this.hostname, this.port);
-    }
-
-
     public MPMessageManager(Socket sock) {
         this.sock = sock;
         this.hostname = sock.getInetAddress().getCanonicalHostName();
@@ -57,14 +49,6 @@ public class MPMessageManager implements Serializable {
             System.err.println("Error: could not cast returned data as a Message.");
             throw new IOException(e);
         }
-    }
-
-    public String getHostname() {
-        return hostname;
-    }
-
-    public int getPort() {
-        return port;
     }
 
 }

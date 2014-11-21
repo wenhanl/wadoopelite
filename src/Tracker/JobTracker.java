@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
-import static msg.MPMessage.MessageType.UPDATE;
 
 /**
+ * JobTracker for mapreduce framework
+ *
  * Created by CGJ on 14-11-12.
  */
 public class JobTracker extends Thread {
@@ -28,14 +29,14 @@ public class JobTracker extends Thread {
     private static MPCoordinator coordinator;
     private static List<MapReduceJob> jobDump;
 
-
     public JobTracker(BlockingDeque<String> q) throws IOException {
         blockingDeque = q;
         curTaskId = 0;
         relatedReducers = new ConcurrentHashMap<>();
         masterServer = new ServerSocket(Config.DATA_PORT);
         coordinator = new MPCoordinator();
-        jobDump = new ArrayList<MapReduceJob>();
+        jobDump = new ArrayList<>();
+        // Create result store folder in case it's not created
         FileManager.createDir(Config.MAP_RESULTS_FOLDER);
     }
 
@@ -66,10 +67,16 @@ public class JobTracker extends Thread {
             return;
         String args[] = input.split(" ");
         if (args[0].equals("mprun")) {
-            // mprun WordCount tt
+            if(args.length != 3){
+                System.out.println("Wrong command format.");
+                return;
+            }
+
+            // Run a user specified mapreduce job
             MapReduceJob newJob = null;
             try {
-                newJob = (MapReduceJob) Class.forName(args[1]).newInstance();
+                String className = "example." + args[1];
+                newJob = (MapReduceJob) Class.forName(className).newInstance();
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -85,6 +92,10 @@ public class JobTracker extends Thread {
 
     }
 
+    /**
+     * Rerun mapreduce job after node failure during running
+     * @param brokenNode
+     */
     public static void rerunMap(List<String> brokenNode) {
         while(true){
             if(MPCoordinator.getTaskMap().isEmpty())
@@ -118,7 +129,7 @@ public class JobTracker extends Thread {
     private void handleConnection(MPMessageManager MsgManager) throws IOException {
         MPMessage msgIn = MsgManager.receiveMessage();
 
-        if (msgIn.getType() == UPDATE) {
+        if (msgIn.getType() == MPMessage.MessageType.UPDATE) {
             coordinator.processTaskUpdateMessage((TaskUpdateMessage) msgIn);
         }
     }
@@ -143,7 +154,10 @@ public class JobTracker extends Thread {
         coordinator.scheduleMapperTasks(allTasks);
     }
 
-
+    /**
+     * Verify all reduce tasks are done from one reducer task
+     * @param task
+     */
     public static void verifyAllReducerTaskDone(ReducerTask task) {
         List<Integer> relatedReducerList = relatedReducers.get(task.getInput());
         for (int j = 0; j < relatedReducerList.size(); j++) {
