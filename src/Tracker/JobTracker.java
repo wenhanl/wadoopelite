@@ -88,6 +88,33 @@ public class JobTracker extends Thread {
             newJob.setInputFile(args[2]);
             jobDump.add(newJob);
             newMPJob(newJob);
+        } else if (args[0].equals("concurrent")){
+            if(args.length != 5){
+                System.out.println("Wrong command format.");
+                return;
+            }
+
+            // Run two jobs concurrently
+            MapReduceJob job1 = null;
+            MapReduceJob job2 = null;
+            try {
+                String className1 = "example." + args[1], className2 = "example." + args[2];
+                job1 = (MapReduceJob) Class.forName(className1).newInstance();
+                job2 = (MapReduceJob) Class.forName(className2).newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            job1.setInputFile(args[3]);
+            job2.setInputFile(args[4]);
+            jobDump.add(job1);
+            jobDump.add(job2);
+            newMPJob(job1);
+            newMPJob(job2);
         }
 
     }
