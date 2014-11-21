@@ -4,11 +4,13 @@ package mapr;
  * Created by CGJ on 14-11-13.
  */
 
+import lombok.Data;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-
+@Data
 public class ReducerTask extends Task {
     private int partitionNum;
     private Reducer reducer;
@@ -23,10 +25,6 @@ public class ReducerTask extends Task {
         for (int mapperTaskId : mapperTaskIds) {
             mapperTaskStatus.put(mapperTaskId, false);
         }
-    }
-
-    public Reducer getReducer() {
-        return reducer;
     }
 
     public Set<Integer> getDependentMapperJobIds() {
@@ -54,14 +52,6 @@ public class ReducerTask extends Task {
             mappersReady &= mapperTaskStatus.get(jobID);
         }
         return mappersReady;
-    }
-
-    public void setPartitionNum(int partitionNum) {
-        this.partitionNum = partitionNum;
-    }
-
-    public int getPartitionNum() {
-        return partitionNum;
     }
 
 }

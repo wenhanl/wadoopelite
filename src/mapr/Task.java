@@ -1,10 +1,14 @@
 package mapr;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
  * Created by CGJ on 14-11-13.
  */
+
+@Data
 public class Task implements Serializable {
     protected int taskID;
     protected String input;
@@ -17,11 +21,5 @@ public class Task implements Serializable {
         running = false;
         done = false;
     }
-
-    public int getTaskID() {
-        return taskID;
-    }
-
-    public String getInput() { return input; }
 
 }
