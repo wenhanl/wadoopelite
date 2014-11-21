@@ -1,6 +1,7 @@
 package mapr;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -8,7 +9,8 @@ import java.io.Serializable;
  * Created by CGJ on 14-11-13.
  */
 
-@Data
+@Getter
+@Setter
 public class Task implements Serializable {
     protected int taskID;
     protected String input;

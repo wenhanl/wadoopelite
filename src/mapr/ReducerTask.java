@@ -4,13 +4,15 @@ package mapr;
  * Created by CGJ on 14-11-13.
  */
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 public class ReducerTask extends Task {
     private int partitionNum;
     private Reducer reducer;
