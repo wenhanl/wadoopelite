@@ -88,6 +88,9 @@ public class TaskTracker extends Thread{
         String line;
         while ((line = br.readLine()) != null) {
             int lastTab = line.lastIndexOf("\t");
+            if(lastTab == -1){
+                continue;
+            }
             String key = line.substring(0, lastTab);
             String value = line.substring(lastTab + 1);
             int partition = Math.abs(key.hashCode() % Config.SLAVE_NODES.length);
