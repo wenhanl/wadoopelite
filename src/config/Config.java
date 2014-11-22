@@ -20,13 +20,13 @@ public class Config {
     public static final int NUM_WHFS_REPLICA = 2;
 
     // Number of lines per block
-    public static final int BLOCK_SIZE = 3;
+    public static final int BLOCK_SIZE = 100;
 
     // WHFS namenode port
     public static final int NAMENODE_PORT = 15826;
 
     // Heartbeat timeout in ms
-    public static final int HEARTBEAT_TIMEOUT = 10000;
+    public static final int HEARTBEAT_TIMEOUT = 5000;
 
     // DataNode file server port
     public static final int DATANODE_FILE_PORT = 15827;
@@ -35,11 +35,11 @@ public class Config {
     public static final String LOCAL_BASE_PATH = "/tmp/mlocal/";
 
     // WHFS base path
-    public static final String WHFS_BASE_PATH = "/tmp/wwhfs/";
+    public static final String WHFS_BASE_PATH = "/tmp/handinwhfs/";
 
     // map and reduce result file folder
-    public static final String MAP_RESULTS_FOLDER = "/tmp/outfinal/";
+    public static final String MAP_RESULTS_FOLDER = "/tmp/handinfinal/";
 
     // WHFS temp path
-    public static final String WHFS_TEMP_PATH = "/tmp/whfstemp/";
+    public static final String WHFS_TEMP_PATH = "/tmp/handinwhfstemp/";
 }
