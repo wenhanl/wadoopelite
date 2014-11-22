@@ -7,7 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-@Data
+
 public abstract class MapReduceJob<Kin, Vin, Kout, Vout> implements Serializable {
 
     private String inputFile;
@@ -17,4 +17,8 @@ public abstract class MapReduceJob<Kin, Vin, Kout, Vout> implements Serializable
     abstract public Mapper<Kin, Vin, Kout, Vout> getMapper();
 
     abstract public Reducer<Kout, Vout, Kout, Vout> getReducer();
+
+    public void setInputFile(String inputFile){this.inputFile = inputFile;}
+
+    public String getInputFile(){return inputFile;}
 }

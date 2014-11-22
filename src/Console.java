@@ -30,7 +30,7 @@ public class Console extends Thread{
 
     void commandHandler(String input){
         try {
-            if(input.contains(("mprun")))
+            if(input.contains("mprun") || input.contains("concurrent"))
                 JobTrackerBlockingDeque.put(input);
             else
                 NameNodeBlockingDeque.put(input);

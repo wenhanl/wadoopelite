@@ -6,6 +6,7 @@ import mapr.*;
 import msg.MPMessage;
 import msg.MPMessageManager;
 import msg.TaskUpdateMessage;
+import java.io.File;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -124,21 +125,39 @@ public class JobTracker extends Thread {
      * @param brokenNode
      */
     public static void rerunMap(List<String> brokenNode) {
-        while(true){
+       /* while(true){
             if(MPCoordinator.getTaskMap().isEmpty())
                 break;
-        }
-        curTaskId = 0;
+        }*/
+	System.out.println("-------------Start rerunning!--------------------");
+       // curTaskId = 0;
         for(MapReduceJob newJob : jobDump){
             List<Task> allTasks = new ArrayList<>();
             List<Integer> mapperTaskId = new ArrayList<>();
             List<Integer> reducerTaskId = new ArrayList<>();
+	 
 
+		String MPFinalOutputFile = Config.MAP_RESULTS_FOLDER + "MP_Result_" + newJob.getInputFile();
+            File file = new File(MPFinalOutputFile);
+
+            if(file.delete()){
+                System.out.println(file.getName() + " is deleted!");
+            }else{
+                System.out.println("Delete operation is failed.");
+            }
+
+
+
+	   String hostname;
             for (int slaveid=0;slaveid < Config.SLAVE_NODES.length;slaveid++) {
-                if( brokenNode.contains(Config.SLAVE_NODES[slaveid]))
-                    continue;
-                String hostname = Config.SLAVE_NODES[slaveid];
-                allTasks.add(new MapperTask(newJob.getMapper(), hostname, curTaskId, newJob.getInputFile()));
+                 if( brokenNode.contains(Config.SLAVE_NODES[slaveid])) {
+                    hostname = Config.SLAVE_NODES[slaveid+1];
+                    ;
+                }
+                else {
+                    hostname = Config.SLAVE_NODES[slaveid];
+                }
+		allTasks.add(new MapperTask(newJob.getMapper(), hostname, curTaskId, newJob.getInputFile()));
                 mapperTaskId.add(curTaskId++);
             }
 
@@ -190,6 +209,7 @@ public class JobTracker extends Thread {
      * @param task
      */
     public static void verifyAllReducerTaskDone(ReducerTask task) {
+	if(relatedReducers.isEmpty())return;
         List<Integer> relatedReducerList = relatedReducers.get(task.getInput());
         for (int j = 0; j < relatedReducerList.size(); j++) {
             int reducerJobId = relatedReducerList.get(j);
@@ -200,6 +220,11 @@ public class JobTracker extends Thread {
         if (relatedReducerList.size() == 0) {
             relatedReducers.remove(task.getInput());
         }
+	
+	/*for(MapReduceJob jobs : jobDump){
+            if(jobs.getInputFile() == task.getInput())
+                jobDump.remove(jobs);
+        }*/
 
         System.out.println("Task " + task.getInput() + " is done! Please check the output file!");
     }

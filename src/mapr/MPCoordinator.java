@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by CGJ on 14-11-13.
  */
@@ -22,7 +22,7 @@ public class MPCoordinator {
     private Integer reducerCounter;
 
     public MPCoordinator() throws IOException {
-        this.taskMap = Collections.synchronizedMap(new HashMap<Integer, Task>());
+        this.taskMap = new ConcurrentHashMap<>();
         reducerCounter = 0;
 
         // Create a empty log file
@@ -69,7 +69,7 @@ public class MPCoordinator {
         try {
             String hostname = Config.SLAVE_NODES[partitionNum];
             while(NameNode.getBrokenNode().contains(Config.SLAVE_NODES[partitionNum]))
-                hostname = Config.SLAVE_NODES[(partitionNum++)%Config.SLAVE_NODES.length];
+                hostname = Config.SLAVE_NODES[(++partitionNum)%Config.SLAVE_NODES.length];
             MPMessageManager slaveComm = new MPMessageManager(hostname, Config.TASK_PORT);
             slaveComm.sendMessage(new MPTaskMessage(reducerTask));
             // set running in each task processed to one
@@ -86,7 +86,9 @@ public class MPCoordinator {
      * @param msg
      */
     public void processTaskUpdateMessage(TaskUpdateMessage msg) {
+	if(taskMap.isEmpty())return;	
         final Task targetTask = taskMap.get(msg.getTaskID());
+	if(targetTask == null)return;
         targetTask.running = msg.isRunning();
         targetTask.done = msg.isDone();
         taskMap.put(targetTask.getTaskID(),targetTask);
@@ -103,7 +105,12 @@ public class MPCoordinator {
                     if (reducerTask.allMappersAreReady()) {
                         //schedule reducer task on a slave
                         System.out.println("All Mappers detected as ready for reducer task with TaskID " + reducerTask.getTaskID() + ", initiating Reducer");
-                        scheduleReducerTasks(reducerTask, NameNode.getBrokenNode());
+/*                        try {
+                            Thread.sleep(15000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }*/
+		        scheduleReducerTasks(reducerTask, NameNode.getBrokenNode());
                     }
                 }
             }

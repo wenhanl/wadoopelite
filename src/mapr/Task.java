@@ -9,8 +9,7 @@ import java.io.Serializable;
  * Created by CGJ on 14-11-13.
  */
 
-@Getter
-@Setter
+
 public class Task implements Serializable {
     protected int taskID;
     protected String input;
@@ -23,5 +22,9 @@ public class Task implements Serializable {
         running = false;
         done = false;
     }
+    public int getTaskID(){return taskID;}
+    public String getInput(){return input;}
+    public void setTaskID(int taskID){this.taskID = taskID;}
+    public void setInput(String input){this.input = input;}
 
 }

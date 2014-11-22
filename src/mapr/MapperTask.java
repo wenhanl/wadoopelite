@@ -7,8 +7,6 @@ import lombok.Setter;
  * Created by CGJ on 14-11-13.
  */
 
-@Getter
-@Setter
 public class MapperTask extends Task {
     private Mapper mapper;
     private String hostname;
@@ -18,5 +16,9 @@ public class MapperTask extends Task {
         this.mapper = mapper;
         this.hostname = hostname;
     }
+    public Mapper getMapper(){return mapper;}
+
+    public String getHostname() {return hostname;}
+
 
 }

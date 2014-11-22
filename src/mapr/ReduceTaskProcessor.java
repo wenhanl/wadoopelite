@@ -8,7 +8,7 @@ import msg.TaskUpdateMessage;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
+import whfs.NameNode;
 /**
  * Created by CGJ on 14-11-13.
  */
@@ -39,6 +39,8 @@ public class ReduceTaskProcessor extends Thread{
             try {
                 // Ask for the result partitions from each slave for this Job ID
                 String hostname = Config.SLAVE_NODES[i];
+		//if(NameNode.getBrokenNode().contains(Config.SLAVE_NODES[0]))
+                    //continue;
                 MPMessageManager requestHandle = new MPMessageManager(hostname, Config.TASK_PORT);
                 requestHandle.sendMessage(new MPPartitionMessage(reduceTask.getPartitionNum(), null, reduceTask));
 

@@ -4,12 +4,12 @@ package config;
  * Created by CGJ on 14-11-13.
  */
 public class Config {
-    public static final String MASTER_NODE = "localhost";
+    public static final String MASTER_NODE = "unix1.andrew.cmu.edu";
     public static final String[] SLAVE_NODES = {
-//           "unix2.andrew.cmu.edu",
-//	       "unix3.andrew.cmu.edu",
-//	       "unix4.andrew.cmu.edu"
-            "localhost"
+           "unix2.andrew.cmu.edu",
+	       "unix3.andrew.cmu.edu",
+	       "unix4.andrew.cmu.edu"
+//            "localhost"
     };
     // port for transferring data in mapreduce phase
     public static final int DATA_PORT = 19782;
@@ -21,7 +21,7 @@ public class Config {
     public static final int NUM_WHFS_REPLICA = 2;
 
     // Number of lines per block
-    public static final int BLOCK_SIZE = 400;
+    public static final int BLOCK_SIZE = 100;
 
     // WHFS namenode port
     public static final int NAMENODE_PORT = 15826;
@@ -33,10 +33,10 @@ public class Config {
     public static final int DATANODE_FILE_PORT = 15827;
 
     // Local base path
-    public static final String LOCAL_BASE_PATH = "/tmp/mlocal/";
+    public static final String LOCAL_BASE_PATH = "/tmp/640local/";
 
     // WHFS base path
-    public static final String WHFS_BASE_PATH = "/tmp/wwhfs/";
+    public static final String WHFS_BASE_PATH = "/tmp/whfs/";
 
     // map and reduce result file folder
     public static final String MAP_RESULTS_FOLDER = "/tmp/final/";

@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 
-
+import config.Config;
 public class MPMessageManager implements Serializable {
 
     private final String hostname;
@@ -17,11 +17,20 @@ public class MPMessageManager implements Serializable {
     private Socket sock;
 
 
-    public MPMessageManager(String hostname, int port) throws IOException {
+    public MPMessageManager(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
 
-        sock = new Socket(this.hostname, this.port);
+      //  sock = new Socket(this.hostname, this.port);
+      try {
+            sock = new Socket(this.hostname, this.port);
+        } catch (IOException e) {
+            try {
+                sock = new Socket(Config.SLAVE_NODES[1], this.port);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
     }
 
 

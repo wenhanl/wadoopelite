@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
+
 public class ReducerTask extends Task {
     private int partitionNum;
     private Reducer reducer;
@@ -55,5 +54,13 @@ public class ReducerTask extends Task {
         }
         return mappersReady;
     }
+
+
+
+    public int getPartitionNum(){return partitionNum;}
+
+    public Reducer getReducer(){return reducer;}
+
+    public void setPartitionNum(int partitionNum){this.partitionNum = partitionNum;}
 
 }
