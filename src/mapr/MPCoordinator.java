@@ -176,10 +176,11 @@ public class MPCoordinator {
         }
         for (int i : taskMap.keySet()) {
             Task cur = taskMap.get(i);
-            if (cur.running == true) {
+            if(cur == null) continue;
+            if (cur.running) {
                 status = "running";
             }
-            else if (cur.done == true){
+            else if (cur.done){
                 status = "done";
             }
             else{
