@@ -44,7 +44,6 @@ public class FileManager {
             channel.close();
             accessFile.close();
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
