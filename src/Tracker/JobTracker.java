@@ -209,8 +209,9 @@ public class JobTracker extends Thread {
      * @param task
      */
     public static void verifyAllReducerTaskDone(ReducerTask task) {
-	if(relatedReducers.isEmpty())return;
+	    if(relatedReducers.isEmpty())return;
         List<Integer> relatedReducerList = relatedReducers.get(task.getInput());
+        if(relatedReducerList == null) return;
         for (int j = 0; j < relatedReducerList.size(); j++) {
             int reducerJobId = relatedReducerList.get(j);
             if (reducerJobId == task.getTaskID()) {
