@@ -8,8 +8,6 @@ import msg.TaskUpdateMessage;
 import whfs.NameNode;
 
 import java.io.*;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MPCoordinator {
 
-    private static Map<Integer, Task> taskMap;
+    private static ConcurrentHashMap<Integer, Task> taskMap;
     private Integer reducerCounter;
 
     public MPCoordinator() throws IOException {
